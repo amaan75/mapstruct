@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +31,35 @@ import static org.assertj.core.api.Assertions.entry;
  */
 @IssueKey("1075")
 class FromMapMappingTest {
+
+
+    @Nested
+    @WithClasses({
+        BeanToMapMapper.class
+    })
+    class BeanToMapMapperTests {
+        @ProcessorTest
+        void toFullMap() {
+            Map<String, String> map = new HashMap<>();
+            map.put( "name", "Jacket" );
+            map.put( "price", "25.5" );
+            map.put( "shipmentDate", "2021-06-15" );
+            BeanToMapMapper.Order order = new BeanToMapMapper.Order();
+            order.setName( "Jacket" );
+            order.setOrderDate( new Date() );
+            order.setPrice( 25 );
+            order.setShipmentDate( LocalDate.now() );
+            Map<String, Object> stringObjectMap = BeanToMapMapper.INSTANCE.fromBean( order );
+
+            assertThat( stringObjectMap ).isNotNull();
+            assertThat( stringObjectMap.get( "name" ) ).isEqualTo( "Jacket" );
+//            assertThat( order.getPrice() ).isEqualTo( 25.5 );
+//            assertThat( order.getOrderDate() ).isNull();
+//            assertThat( order.getShipmentDate() ).isEqualTo( LocalDate.of( 2021, Month.JUNE, 15 ) );
+        }
+
+    }
+
 
     @Nested
     @WithClasses({

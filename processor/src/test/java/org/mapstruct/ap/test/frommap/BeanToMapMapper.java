@@ -1,9 +1,3 @@
-/*
- * Copyright MapStruct Authors.
- *
- * Licensed under the Apache License version 2.0, available at http://www.apache.org/licenses/LICENSE-2.0
- */
-
 package org.mapstruct.ap.test.frommap;
 
 import java.time.LocalDate;
@@ -11,17 +5,14 @@ import java.util.Date;
 import java.util.Map;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.TargetType;
 import org.mapstruct.factory.Mappers;
 
-/**
- * @author Filip Hrisafov
- */
 @Mapper
-public interface StringMapToBeanMapper {
-    StringMapToBeanMapper INSTANCE = Mappers.getMapper( StringMapToBeanMapper.class );
+public interface BeanToMapMapper {
+    BeanToMapMapper INSTANCE = Mappers.getMapper( BeanToMapMapper.class );
 
-    Order fromMap(Map<String, String> map);
+
+    Map<String, Object> fromBean(BeanToMapMapper.Order order);
 
     class Order {
         private String name;
@@ -66,3 +57,5 @@ public interface StringMapToBeanMapper {
     }
 
 }
+
+

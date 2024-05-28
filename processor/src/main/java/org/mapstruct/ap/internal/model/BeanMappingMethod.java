@@ -98,6 +98,8 @@ public class BeanMappingMethod extends NormalTypeMappingMethod {
     private final BuilderType returnTypeBuilder;
     private final MethodReference finalizerMethod;
     private final String finalizedResultName;
+    //only used if the return type for this mapping method is a map;
+    private final IterableCreation iterableCreation;
     private final List<LifecycleCallbackMethodReference> beforeMappingReferencesWithFinalizedReturnType;
     private final List<LifecycleCallbackMethodReference> afterMappingReferencesWithFinalizedReturnType;
 
@@ -175,6 +177,7 @@ public class BeanMappingMethod extends NormalTypeMappingMethod {
             /*  2) or the implementation type that needs to be used when the return type is abstract */
             /*  3) or the builder whenever the return type is immutable */
             Type returnTypeToConstruct = null;
+            IterableCreation iterableType= null;
 
             // determine which return type to construct
             boolean cannotConstructReturnType = false;
@@ -205,14 +208,19 @@ public class BeanMappingMethod extends NormalTypeMappingMethod {
                 }
                 else if ( !method.isUpdateMethod() ) {
                     returnTypeImpl = method.getReturnType();
-                    initializeFactoryMethod( returnTypeImpl, selectionParameters );
-                    if ( factoryMethod != null
-                        || allowsAbstractReturnTypeAndIsEitherAbstractOrCanBeConstructed( returnTypeImpl )
-                        || doesNotAllowAbstractReturnTypeAndCanBeConstructed( returnTypeImpl ) ) {
-                        returnTypeToConstruct = returnTypeImpl;
+                    if ( returnTypeImpl.isMapType() ) {
+                        iterableType = IterableCreation.create( method, first(method.getSourceParameters()));
                     }
                     else {
-                        cannotConstructReturnType = true;
+                        initializeFactoryMethod( returnTypeImpl, selectionParameters );
+                        if ( factoryMethod != null
+                            || allowsAbstractReturnTypeAndIsEitherAbstractOrCanBeConstructed( returnTypeImpl )
+                            || doesNotAllowAbstractReturnTypeAndCanBeConstructed( returnTypeImpl ) ) {
+                            returnTypeToConstruct = returnTypeImpl;
+                        }
+                        else {
+                            cannotConstructReturnType = true;
+                        }
                     }
                 }
             }
@@ -774,6 +782,8 @@ public class BeanMappingMethod extends NormalTypeMappingMethod {
          * @param @selectionParameters
          */
         private void initializeFactoryMethod(Type returnTypeImpl, SelectionParameters selectionParameters) {
+//            ObjectFactoryMethodResolver
+//                .getFactoryMethod( method, null, ctx );
             List<SelectedMethod<SourceMethod>> matchingFactoryMethods =
                 ObjectFactoryMethodResolver.getMatchingFactoryMethods(
                     method,
@@ -2060,6 +2070,13 @@ public class BeanMappingMethod extends NormalTypeMappingMethod {
         }
 
         return types;
+    }
+
+    public IterableCreation getIterableCreation() {
+        if ( iterableCreation == null ) {
+            iterableCreation = IterableCreation.create( this, getSourceParameter() );
+        }
+        return iterableCreation;
     }
 
     public Collection<PresenceCheck> getSourcePresenceChecks() {
