@@ -154,7 +154,7 @@ public class BeanMappingMethod extends NormalTypeMappingMethod {
             method( forgedMethod );
             mappingReferences = forgedMethod.getMappingReferences();
             Parameter sourceParameter = first( Parameter.getSourceParameters( forgedMethod.getParameters() ) );
-            for ( MappingReference mappingReference: mappingReferences.getMappingReferences() ) {
+            for ( MappingReference mappingReference : mappingReferences.getMappingReferences() ) {
                 SourceReference sourceReference = mappingReference.getSourceReference();
                 if ( sourceReference != null ) {
                     mappingReference.setSourceReference( new SourceReference.BuilderFromSourceReference()
@@ -1772,10 +1772,6 @@ public class BeanMappingMethod extends NormalTypeMappingMethod {
 
         private ReportingPolicyGem getUnmappedSourcePolicy() {
             if ( mappingReferences.isForForgedMethods() ) {
-                return ReportingPolicyGem.IGNORE;
-            }
-            // If we have ignoreByDefault = true, unprocessed source properties are not an issue.
-            if ( method.getOptions().getBeanMapping().isignoreByDefault() ) {
                 return ReportingPolicyGem.IGNORE;
             }
             return method.getOptions().getBeanMapping().unmappedSourcePolicy();
